@@ -7,7 +7,311 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to the Charity Water Game Prototype</h1>
-    <script src="script.js"></script>
+<div id="app">
+<!-- =========================
+         MAIN MENU
+    ========================== -->
+    <section id="menuScreen" class="screen active">
+
+        <div class="brand">
+            <span class="brand-icon">▣</span>
+            charity: water
+        </div>
+
+        <h1>
+            Water for
+            <br>
+            Tomorrow 💧
+        </h1>
+
+        <p>
+            Help bring clean water to communities
+            around the world!
+        </p>
+
+        <button id="playButton" class="big-button">
+            Play
+        </button>
+
+        <button id="howButton">
+            How to Play
+        </button>
+
+        <button id="aboutButton">
+            About
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         HOW TO PLAY
+    ========================== -->
+    <section id="howScreen" class="screen">
+
+        <h2>How to Play</h2>
+
+        <div class="instructions">
+
+            <p>💧 1. Collect water containers</p>
+
+            <p>🔧 2. Fix broken wells</p>
+
+            <p>⚠️ 3. Avoid obstacles</p>
+
+            <p>🏠 4. Collect all the water to help the village</p>
+
+        </div>
+
+        <hr>
+
+        <p class="mission-text">
+            🌍 Your actions help real communities
+            get clean, safe water.
+        </p>
+
+        <button id="howBackButton">
+            Back
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         ABOUT
+    ========================== -->
+    <section id="aboutScreen" class="screen">
+
+        <h2>About</h2>
+
+        <p>
+            Water for Tomorrow is inspired by
+            charity: water's mission to help provide
+            clean and safe water to people around
+            the world.
+        </p>
+
+        <p>
+            Collect water, repair wells, avoid
+            obstacles, and help your village!
+        </p>
+
+        <button id="aboutBackButton">
+            Back
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         GAME
+    ========================== -->
+    <section id="gameScreen" class="screen game-screen">
+
+        <!-- HUD -->
+
+        <div id="hud">
+
+            <div class="hud-box">
+                💧
+                <span id="waterCount">0</span>/<span id="waterGoal">5</span>
+                <small>Water</small>
+            </div>
+
+            <div class="hud-box">
+                ⏱
+                <span id="timeDisplay">01:30</span>
+                <small>Time Left</small>
+            </div>
+
+            <div class="hud-box">
+                ❤️
+                <span id="livesDisplay">3</span>
+                <small>Lives</small>
+            </div>
+
+            <div class="hud-box">
+                ⭐
+                <span id="scoreDisplay">0</span>
+                <small>Score</small>
+            </div>
+
+        </div>
+
+
+        <!-- PLAYING AREA -->
+
+        <div id="gameArea">
+
+            <div id="village">
+                🏠
+                <span>Village</span>
+            </div>
+
+            <div id="player">
+                👧
+            </div>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div id="controls">
+
+            <div class="movement-buttons">
+
+                <button data-direction="up">↑</button>
+
+                <div>
+                    <button data-direction="left">←</button>
+                    <button data-direction="down">↓</button>
+                    <button data-direction="right">→</button>
+                </div>
+
+            </div>
+
+            <button id="pauseButton" class="pause-button">
+                ⏸
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PAUSE SCREEN
+    ========================== -->
+    <section id="pauseScreen" class="screen overlay-screen">
+
+        <div class="popup">
+
+            <h2>⏸</h2>
+
+            <h2>Paused</h2>
+
+            <button id="resumeButton">
+                Resume
+            </button>
+
+            <button id="restartButton">
+                Restart
+            </button>
+
+            <button id="mainMenuButton">
+                Main Menu
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         LEVEL COMPLETE
+    ========================== -->
+    <section id="levelScreen" class="screen">
+
+        <div id="confetti">
+            🎉 🎊 🎉 🎊 🎉
+        </div>
+
+        <h1>Great Job!</h1>
+
+        <p>You delivered clean water to the village!</p>
+
+        <div class="results">
+
+            <p>
+                💧 <strong id="resultWater">0</strong>
+                Water Containers Collected
+            </p>
+
+            <p>
+                👨‍👩‍👧‍👦 <strong id="peopleHelped">0</strong>
+                People Helped
+            </p>
+
+            <p>
+                ⭐ Score:
+                <strong id="resultScore">0</strong>
+            </p>
+
+        </div>
+
+        <button id="nextLevelButton" class="big-button">
+            Next Level
+        </button>
+
+        <p class="fact">
+            🌍 Clean water changes everything —
+            health, education, and brighter futures.
+        </p>
+
+    </section>
+
+
+    <!-- =========================
+         GAME OVER
+    ========================== -->
+    <section id="gameOverScreen" class="screen">
+
+        <h1>Try Again!</h1>
+
+        <p id="gameOverMessage">
+            You ran out of time.
+        </p>
+
+        <button id="tryAgainButton">
+            Try Again
+        </button>
+
+        <button id="gameOverMenuButton">
+            Main Menu
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         FINAL SCREEN
+    ========================== -->
+    <section id="thankYouScreen" class="screen">
+
+        <div class="brand">
+            <span class="brand-icon">▣</span>
+            charity: water
+        </div>
+
+        <h1>Thank You!</h1>
+
+        <h2>You made a difference</h2>
+
+        <p>
+            Your support helps provide clean water,
+            change lives, and build healthier,
+            stronger communities around the world.
+        </p>
+
+        <p>
+            ⭐ Final Score:
+            <strong id="finalScore">0</strong>
+        </p>
+
+        <button id="playAgainButton">
+            Play Again
+        </button>
+
+        <div class="big-drop">
+            💧
+        </div>
+
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
