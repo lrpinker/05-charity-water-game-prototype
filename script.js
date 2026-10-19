@@ -499,6 +499,41 @@ document
 
     });
 
+// Keep the player and placed objects inside the play area after rotation or resize.
+window.addEventListener("resize", function() {
+
+    if (!gameScreen.classList.contains("active")) {
+        return;
+    }
+
+    playerX = Math.min(
+        playerX,
+        Math.max(0, gameArea.clientWidth - player.offsetWidth)
+    );
+
+    playerY = Math.min(
+        playerY,
+        Math.max(0, gameArea.clientHeight - player.offsetHeight)
+    );
+
+    updatePlayer();
+
+    document
+        .querySelectorAll(".water, .obstacle, .well")
+        .forEach(function(object) {
+
+            const maxX = Math.max(0, gameArea.clientWidth - object.offsetWidth);
+            const maxY = Math.max(0, gameArea.clientHeight - object.offsetHeight);
+            const objectX = parseFloat(object.style.left) || 0;
+            const objectY = parseFloat(object.style.top) || 0;
+
+            object.style.left = Math.min(objectX, maxX) + "px";
+            object.style.top = Math.min(objectY, maxY) + "px";
+
+        });
+
+});
+
 
 // ==========================================
 // COLLISION FUNCTION
