@@ -13,6 +13,8 @@
     ========================== -->
     <section id="menuScreen" class="screen active">
 
+        <img class="menu-water-can" src="img/water-can-transparent.png" alt="Yellow water can">
+
         <div class="brand">
             <span class="brand-icon">▣</span>
             charity: water
@@ -45,6 +47,38 @@
 
 
     <!-- =========================
+         CHOOSE DIFFICULTY
+    ========================== -->
+    <section id="difficultyScreen" class="screen">
+
+        <h2>Choose a Difficulty</h2>
+
+        <p>Pick how challenging you want your game to be.</p>
+
+        <button id="normalButton" class="big-button">
+            Normal
+        </button>
+
+        <p class="difficulty-description">
+            The regular adventure.
+        </p>
+
+        <button id="hardButton" class="big-button">
+            Hard
+        </button>
+
+        <p class="difficulty-description">
+            More water to collect, more obstacles, and less time.
+        </p>
+
+        <button id="difficultyBackButton">
+            Back
+        </button>
+
+    </section>
+
+
+    <!-- =========================
          HOW TO PLAY
     ========================== -->
     <section id="howScreen" class="screen">
@@ -59,7 +93,7 @@
 
             <p>⚠️ 3. Avoid obstacles</p>
 
-            <p>🏠 4. Collect all the water to help the village</p>
+            <p>🏠 4. Collect all the water, then reach the village</p>
 
         </div>
 
@@ -113,35 +147,45 @@
         <div id="hud">
 
             <div class="hud-box">
-                💧
-                <span id="waterCount">0</span>/<span id="waterGoal">5</span>
-                <small>Water</small>
+                <small class="hud-label">💧 Water</small>
+                <div class="hud-value">
+                    <span id="waterCount">0</span>
+                    <span class="hud-divider">/</span>
+                    <span id="waterGoal">5</span>
+                </div>
             </div>
 
             <div class="hud-box">
-                ⏱
-                <span id="timeDisplay">01:30</span>
-                <small>Time Left</small>
+                <small class="hud-label">⏱ Time</small>
+                <span id="timeDisplay" class="hud-value">01:30</span>
             </div>
 
             <div class="hud-box">
-                ❤️
-                <span id="livesDisplay">3</span>
-                <small>Lives</small>
+                <small class="hud-label">❤️ Lives</small>
+                <span id="livesDisplay" class="hud-value">3</span>
             </div>
 
             <div class="hud-box">
-                ⭐
-                <span id="scoreDisplay">0</span>
-                <small>Score</small>
+                <small class="hud-label">⭐ Score</small>
+                <span id="scoreDisplay" class="hud-value">0</span>
             </div>
 
+        </div>
+
+        <div class="objective-card">
+            <span class="objective-icon">🎯</span>
+            <div>
+                <strong>Objective</strong>
+                <span id="objectiveText">Collect all the water, then reach the village.</span>
+            </div>
         </div>
 
 
         <!-- PLAYING AREA -->
 
         <div id="gameArea">
+
+            <div id="gameFeedback" class="game-feedback" role="status" aria-live="polite"></div>
 
             <div id="village">
                 🏠
@@ -244,10 +288,13 @@
             Next Level
         </button>
 
-        <p class="fact">
-            🌍 Clean water changes everything —
-            health, education, and brighter futures.
-        </p>
+        <div class="fact" aria-live="polite">
+            <strong>🌍 Clean water fact</strong>
+            <p id="levelWaterFact"></p>
+            <a href="https://www.who.int/news-room/fact-sheets/detail/drinking-water" target="_blank" rel="noopener noreferrer">
+                Source: World Health Organization
+            </a>
+        </div>
 
     </section>
 
@@ -279,6 +326,8 @@
     ========================== -->
     <section id="thankYouScreen" class="screen">
 
+        <img class="thank-you-water-can" src="img/water-can-transparent.png" alt="Yellow water can">
+
         <div class="brand">
             <span class="brand-icon">▣</span>
             charity: water
@@ -299,6 +348,14 @@
             <strong id="finalScore">0</strong>
         </p>
 
+        <div class="fact final-fact" aria-live="polite">
+            <strong>🌍 Clean water fact</strong>
+            <p id="finalWaterFact"></p>
+            <a href="https://www.who.int/news-room/fact-sheets/detail/drinking-water" target="_blank" rel="noopener noreferrer">
+                Source: World Health Organization
+            </a>
+        </div>
+
         <button id="playAgainButton">
             Play Again
         </button>
@@ -310,6 +367,13 @@
     </section>
 
 </div>
+
+<footer class="site-footer">
+    <span>Learn more:</span>
+    <a href="https://www.charitywater.org/" target="_blank" rel="noopener noreferrer">charity: water</a>
+    <a href="https://www.charitywater.org/donate/" target="_blank" rel="noopener noreferrer">Donate</a>
+    <a href="https://www.charitywater.org/donate/the-spring" target="_blank" rel="noopener noreferrer">Join The Spring</a>
+</footer>
 
 <script src="script.js"></script>
 

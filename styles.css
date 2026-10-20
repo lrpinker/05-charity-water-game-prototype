@@ -24,10 +24,11 @@ Secondary Colors:
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f5f5;
+    background: #8BD1CB;
     color: #222;
     touch-action: manipulation;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -42,13 +43,36 @@ body {
 #app {
     width: 100%;
     max-width: 430px;
-    height: min(760px, 100vh);
-    height: min(760px, 100dvh);
+    height: min(760px, calc(100vh - 72px));
+    height: min(760px, calc(100dvh - 72px));
     background: white;
     border: 3px solid #333;
     border-radius: 25px;
     overflow: hidden;
     position: relative;
+    flex: 0 0 auto;
+}
+
+.site-footer {
+    width: 100%;
+    min-height: 72px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 14px;
+    padding: 10px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.site-footer a {
+    color: #174f6b;
+}
+
+.site-footer a:focus-visible {
+    outline: 2px solid #174f6b;
+    outline-offset: 3px;
 }
 
 
@@ -94,6 +118,13 @@ p {
     margin-bottom: 20px;
 }
 
+.menu-water-can {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    margin-bottom: 12px;
+}
+
 .brand-icon {
     color: #f5c400;
 }
@@ -106,14 +137,14 @@ p {
 button {
     background: white;
     border: 2px solid #333;
-    border-radius: 6px;
+    border-radius: 12px;
     touch-action: manipulation;
-
-    padding: 10px 20px;
-    margin: 8px;
-
+    font-family: inherit;
+    width: 180px;
+    min-height: 48px;
+    padding: 10px 16px;
+    margin: 6px;
     font-size: 16px;
-
     cursor: pointer;
 }
 
@@ -125,6 +156,10 @@ button:hover {
     width: 180px;
     padding: 14px;
     font-size: 18px;
+}
+
+.difficulty-description {
+    margin: 0 0 12px;
 }
 
 
@@ -167,23 +202,148 @@ button:hover {
 /* HUD */
 
 #hud {
-    display: flex;
-    gap: 5px;
-    flex: 0 0 clamp(56px, 10dvh, 70px);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    flex: 0 0 auto;
 }
 
 .hud-box {
-    border: 1px solid #444;
-    border-radius: 5px;
-    padding: 7px 4px;
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 8px 4px;
+    border: 1px solid #c5b79f;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #fffdf8, #f2eadb);
+    box-shadow: 0 2px 5px rgba(75, 54, 31, 0.12);
+}
+
+.hud-label {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.hud-value {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.1;
+}
+
+.hud-divider {
+    color: #777;
+    font-size: 14px;
+}
+
+.objective-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2b300;
+    border-radius: 12px;
+    background: #fff7d6;
+    text-align: left;
+}
+
+.objective-card > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.objective-card strong {
     font-size: 13px;
 }
 
-.hud-box small {
-    display: block;
-    margin-top: 4px;
+.objective-card #objectiveText {
+    font-size: 13px;
+    line-height: 1.3;
 }
+
+.objective-icon {
+    font-size: 22px;
+}
+
+.game-feedback {
+    position: absolute;
+    z-index: 20;
+    top: 12px;
+    left: 50%;
+    width: max-content;
+    max-width: calc(100% - 24px);
+    padding: 10px 16px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(35, 27, 17, 0.2);
+    font-size: 15px;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+    transform: translate(-50%, -8px);
+}
+
+.feedback-success {
+    color: #155724;
+    border-color: #4fcb53;
+    background: #efffed;
+}
+
+.feedback-warning {
+    color: #842029;
+    border-color: #f5402c;
+    background: #fff0ed;
+}
+
+.feedback-show {
+    animation: feedback-pop 1.6s ease-out forwards;
+}
+
+.stat-pop {
+    animation: stat-pop 0.45s ease-out;
+}
+
+@keyframes feedback-pop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -8px) scale(0.95);
+    }
+
+    12%, 78% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -4px) scale(0.98);
+    }
+}
+
+@keyframes stat-pop {
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 0 3px rgba(255, 201, 7, 0.5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .feedback-show {
+        animation: none;
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    .stat-pop {
+        animation: none;
+    }
+}
+
 
 
 /* =========================
@@ -201,12 +361,32 @@ button:hover {
 
     border: 2px solid #333;
 
+    background-color: #4FCB53;
+    background-size: 47px 53px, 61px 67px, 39px 43px, 100% 100%;
+}
+
+#gameArea::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: -15%;
+    top: 42%;
+    width: 130%;
+    height: 22%;
+    border: 1px solid rgba(116, 84, 49, 0.25);
+    border-radius: 50%;
     background:
         linear-gradient(
-            rgba(255,255,255,0.15),
-            rgba(255,255,255,0.15)
-        ),
-        #4fcb53;
+            180deg,
+            rgba(114, 81, 46, 0.15),
+            rgba(239, 214, 170, 0.72) 18%,
+            #d4b17d 50%,
+            rgba(239, 214, 170, 0.72) 82%,
+            rgba(114, 81, 46, 0.15)
+        );
+    box-shadow: 0 2px 5px rgba(77, 54, 30, 0.12);
+    transform: rotate(-18deg);
+    pointer-events: none;
 }
 
 
@@ -230,6 +410,7 @@ button:hover {
     justify-content: center;
 
     z-index: 10;
+    filter: drop-shadow(0 3px 2px rgba(35, 27, 17, 0.35));
 
     transition:
         left 0.05s linear,
@@ -252,6 +433,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    filter: drop-shadow(0 3px 2px rgba(35, 27, 17, 0.35));
 }
 
 
@@ -270,6 +452,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    filter: drop-shadow(0 4px 2px rgba(35, 27, 17, 0.35));
 }
 
 
@@ -284,6 +467,7 @@ button:hover {
     height: 45px;
 
     font-size: 34px;
+    filter: drop-shadow(0 3px 2px rgba(35, 27, 17, 0.35));
 }
 
 
@@ -298,11 +482,19 @@ button:hover {
     top: 15px;
 
     font-size: 38px;
+    min-width: 70px;
+    padding: 7px;
+    border: 1px solid rgba(119, 88, 54, 0.35);
+    border-radius: 12px;
+    background: rgba(255, 248, 229, 0.8);
+    box-shadow: 0 4px 8px rgba(58, 43, 27, 0.2);
+    z-index: 10;
 }
 
 #village span {
     display: block;
     font-size: 11px;
+    font-weight: bold;
 }
 
 
@@ -317,14 +509,13 @@ button:hover {
 
     justify-content: space-between;
     align-items: center;
+    gap: 80px;
 }
 
 .movement-buttons button {
     width: 50px;
-    height: 40px;
-
+    min-height: 42px;
     font-size: 24px;
-
     padding: 0;
     margin: 1px;
 }
@@ -332,7 +523,7 @@ button:hover {
 .pause-button {
     border-radius: 50%;
     width: 55px;
-    height: 55px;
+    min-height: 55px;
     font-size: 25px;
 }
 
@@ -379,9 +570,26 @@ button:hover {
 }
 
 .fact {
-    margin-top: 30px;
-    border-top: 1px solid #333;
-    padding-top: 20px;
+    width: 100%;
+    margin: 12px 0;
+    padding: 12px 14px;
+    border: 1px solid #8bd1cb;
+    border-radius: 12px;
+    background: #effaf9;
+    text-align: left;
+}
+
+.fact p {
+    margin: 6px 0;
+}
+
+.fact a {
+    color: #174f6b;
+    font-size: 13px;
+}
+
+.final-fact {
+    max-width: 320px;
 }
 
 
@@ -416,6 +624,13 @@ button:hover {
     margin-top: 30px;
 }
 
+.thank-you-water-can {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 12px;
+}
+
 
 /* =========================
    SMALL SCREENS
@@ -430,8 +645,8 @@ button:hover {
     #app {
         width: 100%;
         max-width: 100%;
-        height: 100vh;
-        height: 100dvh;
+        height: calc(100vh - 72px);
+        height: calc(100dvh - 72px);
         border: none;
         border-radius: 0;
     }

@@ -13,6 +13,7 @@ console.log('JavaScript file is linked correctly.');
 const screens = document.querySelectorAll(".screen");
 
 const menuScreen = document.getElementById("menuScreen");
+const difficultyScreen = document.getElementById("difficultyScreen");
 const gameScreen = document.getElementById("gameScreen");
 const pauseScreen = document.getElementById("pauseScreen");
 const levelScreen = document.getElementById("levelScreen");
@@ -21,6 +22,7 @@ const thankYouScreen = document.getElementById("thankYouScreen");
 
 const gameArea = document.getElementById("gameArea");
 const player = document.getElementById("player");
+const village = document.getElementById("village");
 
 
 // HUD
@@ -39,6 +41,12 @@ const livesDisplay =
 
 const scoreDisplay =
     document.getElementById("scoreDisplay");
+
+const objectiveText =
+    document.getElementById("objectiveText");
+
+const gameFeedback =
+    document.getElementById("gameFeedback");
 
 
 // ==========================================
@@ -60,11 +68,13 @@ let timeLeft = 90;
 
 let currentLevel = 1;
 let totalLevels = 3;
+let difficulty = "normal";
 
 let gameRunning = false;
 let isPaused = false;
 
 let timer;
+let audioContext;
 
 
 // ==========================================
@@ -96,6 +106,12 @@ const levels = [
 
 ];
 
+const cleanWaterFacts = [
+    "In 2022, 2.2 billion people lacked safely managed drinking-water services.",
+    "When water is easier to reach, people spend less time and effort collecting it.",
+    "Access to improved water sources can support children's health and school attendance."
+];
+
 
 // ==========================================
 // SCREEN SYSTEM
@@ -115,13 +131,70 @@ function showScreen(screen) {
 // START GAME
 // ==========================================
 
-function startGame() {
+function initializeAudio() {
+
+    const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        console.warn("Web Audio is not supported in this browser.");
+        return;
+    }
+
+    if (!audioContext) {
+        audioContext = new AudioContextClass();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume().catch(function(error) {
+            console.error("Could not start game audio.", error);
+        });
+    }
+}
+
+
+function playSound(frequency, delay, duration, type) {
+
+    if (!audioContext || audioContext.state !== "running") {
+        return;
+    }
+
+    const startTime =
+        audioContext.currentTime + delay;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const volume =
+        audioContext.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+
+    volume.gain.setValueAtTime(0.001, startTime);
+    volume.gain.exponentialRampToValueAtTime(0.15, startTime + 0.01);
+    volume.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    oscillator.connect(volume);
+    volume.connect(audioContext.destination);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+}
+
+
+function startGame(selectedDifficulty = "normal") {
 
     currentLevel = 1;
 
     score = 0;
 
     lives = 3;
+
+    difficulty = selectedDifficulty;
+
+    initializeAudio();
 
     startLevel();
 }
@@ -135,8 +208,18 @@ function startLevel() {
 
     showScreen(gameScreen);
 
-    const level =
+    const baseLevel =
         levels[currentLevel - 1];
+
+    const level =
+        difficulty === "hard"
+            ? {
+                water: baseLevel.water + 2,
+                obstacles: baseLevel.obstacles + 2,
+                wells: baseLevel.wells + 1,
+                time: Math.max(30, baseLevel.time - 15)
+            }
+            : baseLevel;
 
     waterCollected = 0;
 
@@ -165,9 +248,9 @@ function startLevel() {
 
     // Create new level objects.
 
-    createWater(level.water);
-
     createObstacles(level.obstacles);
+
+    createWater(level.water);
 
     createWells(level.wells);
 
@@ -213,9 +296,9 @@ function createWater(amount) {
 
         water.textContent = "💧";
 
-        placeRandomly(water);
-
         gameArea.appendChild(water);
+
+        placeRandomly(water, 50, false, true);
     }
 }
 
@@ -250,9 +333,9 @@ function createObstacles(amount) {
         obstacle.textContent =
             randomIcon;
 
-        placeRandomly(obstacle);
-
         gameArea.appendChild(obstacle);
+
+        placeRandomly(obstacle, 0, true, true);
     }
 }
 
@@ -274,9 +357,9 @@ function createWells(amount) {
 
         well.dataset.fixed = "false";
 
-        placeRandomly(well);
-
         gameArea.appendChild(well);
+
+        placeRandomly(well);
     }
 }
 
@@ -285,35 +368,117 @@ function createWells(amount) {
 // RANDOM POSITION
 // ==========================================
 
-function placeRandomly(object) {
+function placeRandomly(object, obstacleSpacing = 0, keepStartClear = false, keepVillageClear = false) {
 
     const maxX =
         Math.max(
-            50,
-            gameArea.clientWidth - 60
+            0,
+            gameArea.clientWidth - object.offsetWidth - 10
         );
 
     const maxY =
         Math.max(
-            50,
-            gameArea.clientHeight - 60
+            0,
+            gameArea.clientHeight - object.offsetHeight - 10
         );
 
-    const x =
-        Math.floor(
-            Math.random() * maxX
-        );
+    const obstacles =
+        obstacleSpacing > 0
+            ? gameArea.querySelectorAll(".obstacle")
+            : [];
 
-    const y =
-        Math.floor(
-            Math.random() * maxY
-        );
+    for (let attempt = 0; attempt < 100; attempt++) {
 
-    object.style.left =
-        x + "px";
+        const x =
+            Math.floor(
+                Math.random() * (maxX + 1)
+            );
 
-    object.style.top =
-        y + "px";
+        const y =
+            Math.floor(
+                Math.random() * (maxY + 1)
+            );
+
+        const tooCloseToObstacle =
+            Array.from(obstacles).some(function(obstacle) {
+
+                const horizontalGap =
+                    Math.max(
+                        0,
+                        obstacle.offsetLeft - (x + object.offsetWidth),
+                        x - (obstacle.offsetLeft + obstacle.offsetWidth)
+                    );
+
+                const verticalGap =
+                    Math.max(
+                        0,
+                        obstacle.offsetTop - (y + object.offsetHeight),
+                        y - (obstacle.offsetTop + obstacle.offsetHeight)
+                    );
+
+                return Math.hypot(horizontalGap, verticalGap) < obstacleSpacing;
+
+            });
+
+        const startHorizontalGap =
+            Math.max(
+                0,
+                playerX - (x + object.offsetWidth),
+                x - (playerX + player.offsetWidth)
+            );
+
+        const startVerticalGap =
+            Math.max(
+                0,
+                playerY - (y + object.offsetHeight),
+                y - (playerY + player.offsetHeight)
+            );
+
+        const tooCloseToPlayerStart =
+            keepStartClear &&
+            Math.hypot(startHorizontalGap, startVerticalGap) < 60;
+
+        const villageX =
+            village.offsetLeft;
+
+        const villageY =
+            village.offsetTop;
+
+        const villageHorizontalGap =
+            Math.max(
+                0,
+                villageX - (x + object.offsetWidth),
+                x - (villageX + village.offsetWidth)
+            );
+
+        const villageVerticalGap =
+            Math.max(
+                0,
+                villageY - (y + object.offsetHeight),
+                y - (villageY + village.offsetHeight)
+            );
+
+        const tooCloseToVillage =
+            keepVillageClear &&
+            Math.hypot(villageHorizontalGap, villageVerticalGap) < 70;
+
+        if (
+            !tooCloseToObstacle &&
+            !tooCloseToPlayerStart &&
+            !tooCloseToVillage
+        ) {
+
+            object.style.left =
+                x + "px";
+
+            object.style.top =
+                y + "px";
+
+            return;
+        }
+    }
+
+    throw new Error("Could not find a safe position for the game object.");
 }
 
 
@@ -571,6 +736,31 @@ function checkCollisions() {
 }
 
 
+function showGameFeedback(message, type, statCard) {
+
+    gameFeedback.textContent = message;
+    gameFeedback.className = `game-feedback feedback-${type}`;
+
+    // Restart the brief animation so repeated feedback is visible.
+    clearTimeout(feedbackTimeout);
+    void gameFeedback.offsetWidth;
+    gameFeedback.classList.add("feedback-show");
+
+    if (statCard) {
+        const card =
+            document.getElementById(statCard).closest(".hud-box");
+
+        card.classList.remove("stat-pop");
+        void card.offsetWidth;
+        card.classList.add("stat-pop");
+    }
+
+    feedbackTimeout = setTimeout(function() {
+        gameFeedback.classList.remove("feedback-show");
+    }, 1600);
+}
+
+
 // ==========================================
 // WATER COLLISION
 // ==========================================
@@ -593,6 +783,15 @@ function checkWaterCollision() {
             waterCollected++;
 
             score += 100;
+
+            playSound(660, 0, 0.12, "sine");
+            playSound(880, 0.09, 0.16, "sine");
+
+            showGameFeedback(
+                "+1 Clean Water! +100 points",
+                "success",
+                "waterCount"
+            );
 
             updateHUD();
 
@@ -638,6 +837,7 @@ function checkObstacleCollision() {
 // ==========================================
 
 let recentlyHit = false;
+let feedbackTimeout;
 
 
 function hitObstacle() {
@@ -650,6 +850,8 @@ function hitObstacle() {
     }
 
     recentlyHit = true;
+
+    playSound(180, 0, 0.22, "square");
 
     lives--;
 
@@ -674,11 +876,17 @@ function hitObstacle() {
 
     updateHUD();
 
+    showGameFeedback(
+        "Obstacle hit! -1 life, -50 points. Sent back to start.",
+        "warning",
+        "livesDisplay"
+    );
+
 
     if (lives <= 0) {
 
         endGame(
-            "You ran out of lives!"
+            "An obstacle hit cost your last life and 50 points."
         );
 
     }
@@ -727,6 +935,12 @@ function repairNearbyWell() {
                     "⛲";
 
                 score += 250;
+
+                showGameFeedback(
+                    "Well repaired! +250 points",
+                    "success",
+                    "scoreDisplay"
+                );
 
                 updateHUD();
             }
@@ -823,6 +1037,11 @@ function updateHUD() {
 
     timeDisplay.textContent =
         formatTime(timeLeft);
+
+    objectiveText.textContent =
+        waterCollected >= waterGoal
+            ? "All water collected! Reach the village."
+            : `Collect all the water, then reach the village.`;
 }
 
 
@@ -833,7 +1052,8 @@ function updateHUD() {
 function checkLevelComplete() {
 
     if (
-        waterCollected >= waterGoal
+        waterCollected >= waterGoal &&
+        isColliding(player, village)
     ) {
 
         completeLevel();
@@ -851,6 +1071,11 @@ function completeLevel() {
     gameRunning = false;
 
     clearInterval(timer);
+
+    playSound(523, 0, 0.16, "sine");
+    playSound(659, 0.14, 0.16, "sine");
+    playSound(784, 0.28, 0.16, "sine");
+    playSound(1047, 0.42, 0.3, "sine");
 
 
     // Bonus for remaining time.
@@ -874,6 +1099,15 @@ function completeLevel() {
         "resultScore"
     ).textContent =
         score;
+
+    const waterFact =
+        cleanWaterFacts[(currentLevel - 1) % cleanWaterFacts.length];
+
+    document.getElementById("levelWaterFact").textContent =
+        waterFact;
+
+    document.getElementById("finalWaterFact").textContent =
+        waterFact;
 
 
     // Final level?
@@ -999,7 +1233,49 @@ document.getElementById(
     "playButton"
 ).addEventListener(
     "click",
-    startGame
+    function() {
+
+        showScreen(difficultyScreen);
+
+    }
+);
+
+
+// Difficulty choices
+
+document.getElementById(
+    "normalButton"
+).addEventListener(
+    "click",
+    function() {
+
+        startGame("normal");
+
+    }
+);
+
+
+document.getElementById(
+    "hardButton"
+).addEventListener(
+    "click",
+    function() {
+
+        startGame("hard");
+
+    }
+);
+
+
+document.getElementById(
+    "difficultyBackButton"
+).addEventListener(
+    "click",
+    function() {
+
+        showScreen(menuScreen);
+
+    }
 );
 
 
